@@ -24,16 +24,16 @@
 解決方式(暫時):前端發送請求(post)後，將使用者帳號以明文方式儲存到cookie，需要取得資料時再次發送請求(post)並將cookie的值取出放入data。
 
 ## 前端框架(VUE)筆記
-1.事件綁定
+1.事件綁定      
 ●v-on:click="事件名稱"--->當元件被點擊('click')時，觸發事件。         
 ●v-model="資料"--->透過v-model可以雙向綁定HTML的標籤與JS的資料
 {{資料}}--->將JS的'資料'放在{{}}之中，可以單向輸出到HTML的標籤上。       
-2.父元件與子元件之間的溝通
+2.父元件與子元件之間的溝通      
 ●props--->父元件向子元件傳遞訊息        
 
 ●$emit--->子元件向父元件傳遞訊息     
 
-3.Vue全域註冊(Vue3)
+3.Vue全域註冊(Vue3)      
 app.config.globalProperties.filters = {     
   test,      
   getCookie       
