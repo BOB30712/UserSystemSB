@@ -41,13 +41,14 @@ export default {
         }
       })
         .then((response) => {
+          const CreateDate = new Date(response.data.createddate)
           if (response.data !== null) {
             this.user.userno = response.data.userno
             this.user.username = response.data.username
             this.user.accountnumber = response.data.accountnumber
             this.user.password = response.data.password
             this.user.useremail = response.data.useremail
-            this.user.createddate = response.data.createddate
+            this.user.createddate = CreateDate.getFullYear() + '/' + (CreateDate.getMonth() + 1) + '/' + CreateDate.getDate()
           } else {
             alert('帳號不存在')
           }

@@ -5,7 +5,10 @@ import java.util.Date;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +31,8 @@ public class UserController {
 
 	@Autowired
 	UserService userService;
+	@Autowired
+    private JavaMailSender mailSender;
 	
 	//帳號登入
 	//第一步，取得輸入的帳號、密碼
@@ -84,10 +89,12 @@ public class UserController {
 	}
 	
 	//確認是否有重複帳號
-	@PostMapping("/testaccount")
+	@PostMapping("/checkAccount")
 	@ResponseBody
-	public String testAccount(@RequestBody Map<String,String> Data) {
+	public String checkAccount(@RequestBody Map<String,String> Data) {
 		User user=userService.searchUser(Data.get("accountnumber"));
+		System.out.println("user:"+user);
+		System.out.println("Data:"+Data.get("accountnumber"));
 		if(user==null) {
 			System.out.println("帳號驗證成功");
 			return "帳號驗證成功";
@@ -97,6 +104,58 @@ public class UserController {
 		}
 	}
 	
+	//向信箱寄送驗證碼(4碼)
+	//回傳驗證碼給前端，同時寄信給目標的信箱
+	@PostMapping("/checkEmail")
+	@ResponseBody
+	public String checkEmail(@RequestBody Map<String,String> Data) {
+		//產生隨機驗證碼
+		String checkNumber="";
+		while(checkNumber.length()<4){//隨機4位數密碼
+			checkNumber+=(int)(Math.random()*10);//隨機0~9數字
+		}
+		//呼叫JavaMailSender
+		SimpleMailMessage message = new SimpleMailMessage();
+		message.setFrom("a0930023855@Outlook.com");
+		message.setTo(Data.get("useremail"));
+		message.setSubject("主旨：使用者系統信箱驗證");
+		message.setText("內容：這是信箱驗證碼 "+checkNumber);
+		mailSender.send(message);
+		
+		System.out.println("已傳送信件到"+Data.get("useremail"));
+		return checkNumber;
+	}
 	
+	//向信箱寄送新密碼(6碼)
+	@PostMapping("/forgotPassword")
+	@ResponseBody
+	public String forgotPassword(@RequestBody Map<String,String> Data) {
+		String newPassword="";
+		while(newPassword.length()<6){//隨機6位數密碼
+			newPassword+=(int)(Math.random()*10);//隨機0~9數字
+		}
+		
+		User user=userService.searchUser(Data.get("accountnumber"));
+		System.out.println("user:"+user);
+		System.out.println("Data:"+Data.get("accountnumber"));
+		if(user!=null) {
+			System.out.println("帳號驗證成功");
+			user.setPassword(DigestUtils.md5DigestAsHex(newPassword.getBytes()));
+			userService.updateUser(user);
+			
+			//呼叫JavaMailSender
+			SimpleMailMessage message = new SimpleMailMessage();
+			message.setFrom("a0930023855@Outlook.com");
+			message.setTo(user.getUseremail());
+			message.setSubject("主旨：使用者系統密碼更換");
+			message.setText("內容：新密碼 "+newPassword);
+			mailSender.send(message);
+			
+			return "已重新設定密碼";
+		}else {
+			System.out.println("帳號不存在");
+			return "帳號不存在";
+		}
+	}
 	
 }
