@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jwttest</title>
+</head>
+<body>
+
+    <button id='Register' style="margin:10px 10px;"><h1 style="margin:0px;">jwttest</h1></button>
+    
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>	
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+    const testaccount=document.querySelector('#Register');
+    testaccount.addEventListener('click',event=>{
+        const token='eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNjczMzM1MzQ2fQ.q9CP4O5_MxEx-PfRfhjPjqOYdxFjqlGPpgEUsZXJGNNBzWE_GaIQ5y6e7dlEIiI7tLwc4Oe9jORN3AKHSy4egQ'
+       
+        axios({
+            method: 'post',
+            url: 'http://localhost:8080/testlogin',
+            headers:{'Authorization':token},
+            data: {
+                'accountnumber':123456
+            }
+        })
+        .then((response) => {
+            console.log(response)
+        })
+        .catch((error) => console.log(error))
+    })
+    </script>
+</body>
+</html>
